@@ -231,6 +231,11 @@ mod tests {
 
         assert_eq!(a.cross(&b), Vec3::new(-3_f64, 6_f64, -3_f64));
     }
+
+    #[test]
+    fn default_test() {
+        assert_eq!(Vec3::default(), Vec3::new(0_f64, 0_f64, 0_f64));
+    }
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -297,6 +302,14 @@ impl Vec3 {
 
     pub fn length(&self) -> f64 {
         self.length2().sqrt()
+    }
+}
+
+impl Default for Vec3 {
+    fn default() -> Self {
+        Self {
+            components: [0_f64, 0_f64, 0_f64],
+        }
     }
 }
 
