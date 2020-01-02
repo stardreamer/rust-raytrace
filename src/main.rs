@@ -31,9 +31,7 @@ fn main() {
 
             let r = Ray::new(origin, lower_left_corner + u * horizontal + v * vertical);
             let col = color(&r);
-            let ir = (255.99 * col.r()) as i64;
-            let ig = (255.99 * col.g()) as i64;
-            let ib = (255.99 * col.b()) as i64;
+            let (ir, ig, ib) = col.irgb(255.99_f64);
             writeln!(&mut file, "{} {} {}", ir, ig, ib).expect("Unable to write to file");
         }
     }
