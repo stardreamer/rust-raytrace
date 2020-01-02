@@ -236,6 +236,17 @@ mod tests {
     fn default_test() {
         assert_eq!(Vec3::default(), Vec3::new(0_f64, 0_f64, 0_f64));
     }
+
+    #[test]
+    fn rgb_test() {
+        let v = Vec3::new(12_f64, 13_f64, 14_f64);
+
+        let (r, g, b) = v.irgb(1_f64);
+
+        assert_eq!(r, 12_i64);
+        assert_eq!(g, 13_i64);
+        assert_eq!(b, 14_i64);
+    }
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -260,6 +271,14 @@ impl Vec3 {
 
     pub fn dot(&self, other: &Self) -> f64 {
         self.x() * other.x() + self.y() * other.y() + self.z() * other.z()
+    }
+
+    pub fn irgb(&self, scale_factor: f64) -> (i64, i64, i64) {
+        (
+            (self.r() * scale_factor) as i64,
+            (self.g() * scale_factor) as i64,
+            (self.b() * scale_factor) as i64,
+        )
     }
 
     pub fn cross(&self, other: &Self) -> Self {
