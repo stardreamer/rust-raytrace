@@ -1,6 +1,7 @@
 use crate::structs::ray::Ray;
 use crate::structs::vec3::Vec3;
 
+pub mod camera;
 pub mod hittablelist;
 pub mod sphere;
 
