@@ -1,7 +1,12 @@
+mod materials;
 mod obj;
 mod random;
 mod structs;
 
+use materials::lambertian::Lambertian;
+use materials::metal::Metal;
+use materials::Material;
+use materials::Scatterable;
 use obj::camera::Camera;
 use obj::hittablelist::HittableList;
 use obj::sphere::Sphere;
@@ -11,26 +16,18 @@ use std::io::Write;
 use structs::ray::Ray;
 use structs::vec3::Vec3;
 
-fn random_in_unit_sphere(rng: &mut impl Iterator<Item = f64>) -> Vec3 {
-    let mut r_vec = Vec3::new(2_f64, 2_f64, 2_f64);
-
-    while r_vec.length2() >= 1_f64 {
-        r_vec = Vec3::new(
-            2_f64 * rng.next().unwrap() - 1_f64,
-            2_f64 * rng.next().unwrap() - 1_f64,
-            2_f64 * rng.next().unwrap() - 1_f64,
-        );
-    }
-
-    r_vec
-}
-
-fn color(ray: &Ray, world: &HittableList, rng: &mut impl Iterator<Item = f64>) -> Vec3 {
+fn color(ray: &Ray, world: &HittableList, rng: &mut impl Iterator<Item = f64>, depth: i32) -> Vec3 {
     match world.hit(ray, 0.001_f64, std::f64::MAX) {
-        Some(hit) => {
-            let target = hit.p + hit.n + random_in_unit_sphere(rng);
-            0.5_f64 * color(&Ray::new(hit.p, target - hit.p), world, rng)
-        }
+        Some(hit) => match hit.material.scatter(ray, &hit, rng) {
+            Some((scattered_ray, attenuation)) => {
+                if depth > 50 {
+                    return Vec3::new(0_f64, 0_f64, 0_f64);
+                }
+
+                attenuation * color(&scattered_ray, world, rng, depth + 1)
+            }
+            None => Vec3::new(0_f64, 0_f64, 0_f64),
+        },
         None => {
             let unit_direction = ray.direction.unit_vector();
 
@@ -57,8 +54,36 @@ fn main() {
 
     let world = HittableList {
         objects: vec![
-            Box::new(Sphere::new(Vec3::new(0_f64, 0_f64, -1_f64), 0.5)),
-            Box::new(Sphere::new(Vec3::new(0_f64, -100.5_f64, -1_f64), 100_f64)),
+            Box::new(Sphere::new(
+                Vec3::new(0_f64, 0_f64, -1_f64),
+                0.5,
+                Material::Lambertian(Lambertian {
+                    albedo: Vec3::new(0.8_f64, 0.3_f64, 0.3_f64),
+                }),
+            )),
+            Box::new(Sphere::new(
+                Vec3::new(0_f64, -100.5_f64, -1_f64),
+                100_f64,
+                Material::Lambertian(Lambertian {
+                    albedo: Vec3::new(0.8_f64, 0.8_f64, 0_f64),
+                }),
+            )),
+            Box::new(Sphere::new(
+                Vec3::new(1_f64, 0_f64, -1_f64),
+                0.5_f64,
+                Material::Metal(Metal {
+                    albedo: Vec3::new(0.8_f64, 0.6_f64, 0.2_f64),
+                    fuzz: 0_f64,
+                }),
+            )),
+            Box::new(Sphere::new(
+                Vec3::new(-1_f64, 0_f64, -1_f64),
+                0.5_f64,
+                Material::Metal(Metal {
+                    albedo: Vec3::new(0.8_f64, 0.8_f64, 0.8_f64),
+                    fuzz: 0_f64,
+                }),
+            )),
         ],
     };
 
@@ -78,7 +103,7 @@ fn main() {
 
             let mut col = Vec3::default();
             for ray in r_rays {
-                col += color(&ray, &world, &mut g);
+                col += color(&ray, &world, &mut g, 0);
             }
 
             col /= ns as f64;

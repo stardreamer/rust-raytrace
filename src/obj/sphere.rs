@@ -1,5 +1,6 @@
 use super::HitRecord;
 use super::Hittable;
+use crate::materials::Material;
 use crate::structs::ray::Ray;
 use crate::structs::vec3::Vec3;
 
@@ -10,7 +11,7 @@ mod tests {
 
     #[test]
     fn hit_test() {
-        let s = Sphere::new(Vec3::new(0_f64, 0_f64, -1_f64), 0.5);
+        let s = Sphere::new(Vec3::new(0_f64, 0_f64, -1_f64), 0.5, Material::default());
         let r = Ray::new(Vec3::default(), s.center);
         let m_r = Ray::new(Vec3::default(), -1_f64 * s.center);
 
@@ -26,13 +27,15 @@ mod tests {
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
+    pub material: Material,
 }
 
 impl Sphere {
-    pub fn new(center: Vec3, radius: f64) -> Self {
+    pub fn new(center: Vec3, radius: f64, material: Material) -> Self {
         Self {
             center: center,
             radius: radius,
+            material: material,
         }
     }
 }
@@ -54,6 +57,7 @@ impl Hittable for Sphere {
                     t: t_fi,
                     p: p_fi,
                     n: (p_fi - self.center) / self.radius,
+                    material: &self.material,
                 });
             }
 
@@ -65,6 +69,7 @@ impl Hittable for Sphere {
                     t: t_si,
                     p: p_si,
                     n: (p_si - self.center) / self.radius,
+                    material: &self.material,
                 });
             }
         }
