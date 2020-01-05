@@ -3,6 +3,7 @@ mod obj;
 mod random;
 mod structs;
 
+use materials::dielectric::Dielectric;
 use materials::lambertian::Lambertian;
 use materials::metal::Metal;
 use materials::Material;
@@ -72,16 +73,22 @@ fn main() {
                 Vec3::new(1_f64, 0_f64, -1_f64),
                 0.5_f64,
                 Material::Metal(Metal {
-                    albedo: Vec3::new(0.8_f64, 0.6_f64, 0.2_f64),
+                    albedo: Vec3::new(0.8_f64, 0.8_f64, 0.8_f64),
                     fuzz: 0_f64,
                 }),
             )),
             Box::new(Sphere::new(
                 Vec3::new(-1_f64, 0_f64, -1_f64),
                 0.5_f64,
-                Material::Metal(Metal {
-                    albedo: Vec3::new(0.8_f64, 0.8_f64, 0.8_f64),
-                    fuzz: 0_f64,
+                Material::Dielectric(Dielectric {
+                    reflection_index: 1.5,
+                }),
+            )),
+            Box::new(Sphere::new(
+                Vec3::new(-1_f64, 0_f64, -1_f64),
+                -0.45_f64,
+                Material::Dielectric(Dielectric {
+                    reflection_index: 1.5,
                 }),
             )),
         ],
