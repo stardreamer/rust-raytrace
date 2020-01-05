@@ -4,7 +4,7 @@ use crate::structs::vec3::Vec3;
 use super::Scatterable;
 use crate::obj::HitRecord;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Lambertian {
     pub albedo: Vec3,
 }
@@ -12,7 +12,7 @@ pub struct Lambertian {
 impl Scatterable for Lambertian {
     fn scatter(
         &self,
-        ray: &Ray,
+        _ray: &Ray,
         hit: &HitRecord,
         rng: &mut impl Iterator<Item = f64>,
     ) -> Option<(Ray, Vec3)> {

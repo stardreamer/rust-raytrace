@@ -4,7 +4,7 @@ use crate::structs::vec3::Vec3;
 use super::Scatterable;
 use crate::obj::HitRecord;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub struct Metal {
     pub albedo: Vec3,
     pub fuzz: f64,
